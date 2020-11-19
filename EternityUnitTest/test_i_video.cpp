@@ -1,30 +1,73 @@
 #include "gtest/gtest.h"
+#include "doomdef.h"
 #include "i_video.h"
 
 TEST(IVideo, Geom)
 {
+	// Sanity check of constants
+	ASSERT_GE(Geom::minimumWidth, 1);
+	ASSERT_GE(Geom::minimumHeight, 1);
+	ASSERT_GT(MAX_SCREENWIDTH, Geom::minimumWidth);
+	ASSERT_GT(MAX_SCREENHEIGHT, Geom::minimumHeight);
+	ASSERT_GE(Geom::fallbackWidth, Geom::minimumWidth);
+	ASSERT_GE(Geom::fallbackHeight, Geom::minimumHeight);
+	ASSERT_GE(MAX_SCREENWIDTH, Geom::fallbackWidth);
+	ASSERT_GE(MAX_SCREENHEIGHT, Geom::fallbackHeight);
+
 	Geom geom;
-	ASSERT_EQ(geom.toString(), "640x480w");
 
-	geom.parse("800x600");
-	ASSERT_EQ(geom.toString(), "800x600w");
+	// Check that it starts with default values
+	char strbuf[16];
+	snprintf(strbuf, sizeof(strbuf), "%dx%dw", Geom::fallbackWidth, Geom::fallbackHeight);
+	ASSERT_EQ(geom.toString(), strbuf);
 
-	geom.parse("200x200");
-	ASSERT_EQ(geom.toString(), "640x200w");
+	// Check that the common resolutions are all supported
+	static const char *const commonResolutions[] =
+	{
+		"320x200",
+		"640x480",
+		"800x600",
+		"1024x768",
+		"1280x1024",
+		"1440x900",
+		"1920x1080",
+		"2880x1800"
+	};
+	for(const char *resolution : commonResolutions)
+	{
+		geom.parse(resolution);
+		// Also check that the w flag is added
+		snprintf(strbuf, sizeof(strbuf), "%sw", resolution);
+		ASSERT_EQ(geom.toString(), strbuf);
+	}
 
-	geom.parse("320x100");
-	ASSERT_EQ(geom.toString(), "320x480w");
+	const int tooSmallWidth = Geom::minimumWidth - 1;
+	const int tooSmallHeight = Geom::minimumHeight - 1;
+	const int tooLargeWidth = MAX_SCREENWIDTH + 1;
+	const int tooLargeHeight = MAX_SCREENHEIGHT + 1;
 
-	geom.parse("320x200");
-	ASSERT_EQ(geom.toString(), "320x200w");
+	// Check that invalid width but valid height produces fallback*height
+	snprintf(strbuf, sizeof(strbuf), "%dx%d", tooSmallWidth, Geom::minimumHeight);
+	geom.parse(strbuf);
+	snprintf(strbuf, sizeof(strbuf), "%dx%dw", Geom::fallbackWidth, Geom::minimumHeight);
+	ASSERT_EQ(geom.toString(), strbuf);
 
+	// Check that valid width and invalid height produces width*fallback
+	snprintf(strbuf, sizeof(strbuf), "%dx%d", Geom::minimumWidth, tooSmallHeight);
+	geom.parse(strbuf);
+	snprintf(strbuf, sizeof(strbuf), "%dx%dw", Geom::minimumWidth, Geom::fallbackHeight);
+	ASSERT_EQ(geom.toString(), strbuf);
+
+	// Check that + prefixes and duplicate flags get cleaned up
 	geom.parse("+500x+500wddffaaavvvshn"); // allow positive signs and reduce doubles, choosing last
 	ASSERT_EQ(geom.toString(), "500x500fvhn");
 
+	// Same as above, but with opposite order.
 	// NOTE: it alters the previous geom state
 	geom.parse("500x500wddffdvvvahsn");
 	ASSERT_EQ(geom.toString(), "500x500dan");
 
+	// Check that capitals get reduced. Also check that old settings remain
 	geom.parse("1024X768FD");
 	ASSERT_EQ(geom.toString(), "1024x768dan");
 
@@ -32,7 +75,7 @@ TEST(IVideo, Geom)
 	geom.parse("W");
 	ASSERT_EQ(geom.toString(), "1024x768wan");
 
-	// Remove sync option
+	// Remove vsync option
 	geom.vsync = Geom::TriState::neutral;
 	ASSERT_EQ(geom.toString(), "1024x768wn");
 
@@ -40,36 +83,48 @@ TEST(IVideo, Geom)
 	Geom geom2("0800x0600"); // work with a clear one
 	ASSERT_EQ(geom2.toString(), "800x600w");
 
+	// Check that xSomething means to change height
 	Geom geom3("x400");
 	ASSERT_EQ(geom3.toString(), "640x400w");
 
+	// Check that a number produces a width
 	geom3.parse("500");
 	ASSERT_EQ(geom3.toString(), "500x400w");
 
-	geom3.parse("x650");
-	ASSERT_EQ(geom3.toString(), "500x650w");
-
 	geom3.parse("x"); // make sure this junk x does nothing
-	ASSERT_EQ(geom3.toString(), "500x650w");
+	ASSERT_EQ(geom3.toString(), "500x400w");
 
 	geom3.parse("");  // or this
-	ASSERT_EQ(geom3.toString(), "500x650w");
+	ASSERT_EQ(geom3.toString(), "500x400w");
 
 	geom3.parse("-");  // or this
-	ASSERT_EQ(geom3.toString(), "500x650w");
+	ASSERT_EQ(geom3.toString(), "500x400w");
 
-	geom3.parse("0"); // a stray zero should be interpreted as an invalid width attempt
-	ASSERT_EQ(geom3.toString(), "640x650w");
+	// a stray zero should be interpreted as an invalid width attempt
+	geom3.parse("0"); 
+	snprintf(strbuf, sizeof(strbuf), "%dx400w", Geom::fallbackWidth);
+	ASSERT_EQ(geom3.toString(), strbuf);
 
+	// A missing height should not change anything
 	geom3.parse("500xf");
-	ASSERT_EQ(geom3.toString(), "500x650f");
+	ASSERT_EQ(geom3.toString(), "500x400f");
 
 	geom3.parse("-d");  // invalid character followed by flag
-	ASSERT_EQ(geom3.toString(), "500x650d");
+	ASSERT_EQ(geom3.toString(), "500x400d");
 
 	geom3.parse("-400x-300");  // negative values should be interpreted likewise as invalid
-	ASSERT_EQ(geom3.toString(), "640x480d");
+	snprintf(strbuf, sizeof(strbuf), "%dx%dd", Geom::fallbackWidth, Geom::fallbackHeight);
+	ASSERT_EQ(geom3.toString(), strbuf);
 
-	Geom geom4("60000x40000fd");  // ridiculously large value
-	ASSERT_EQ(geom4.toString(), "640x480d");
+	// ridiculously large value
+	snprintf(strbuf, sizeof(strbuf), "%dx%dfd", tooLargeWidth, tooLargeHeight);
+	Geom geom4(strbuf);
+	snprintf(strbuf, sizeof(strbuf), "%dx%dd", Geom::fallbackWidth, Geom::fallbackHeight);
+	ASSERT_EQ(geom4.toString(), strbuf);
+
+	// Limit is legal
+	snprintf(strbuf, sizeof(strbuf), "%dx%d", MAX_SCREENWIDTH, MAX_SCREENHEIGHT);
+	geom4.parse(strbuf);
+	snprintf(strbuf, sizeof(strbuf), "%dx%dd", MAX_SCREENWIDTH, MAX_SCREENHEIGHT);
+	ASSERT_EQ(geom4.toString(), strbuf);
 }
