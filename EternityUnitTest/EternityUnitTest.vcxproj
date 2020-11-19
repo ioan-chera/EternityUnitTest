@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EternityUnitTest.cpp" />
+    <ClCompile Include="MyArg.cpp" />
     <ClCompile Include="test_i_video.cpp" />
     <ClCompile Include="test_m_argv.cpp" />
   </ItemGroup>
@@ -170,6 +171,9 @@
     <ProjectReference Include="..\modules\eternity\vc2019\Eternity.vcxproj">
       <Project>{233045e2-53a6-4579-a272-3d3cf6d97405}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MyArg.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

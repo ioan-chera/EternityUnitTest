@@ -24,5 +24,13 @@
     <ClCompile Include="test_m_argv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MyArg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MyArg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
