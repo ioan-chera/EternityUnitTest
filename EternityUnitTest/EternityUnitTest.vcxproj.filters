@@ -21,5 +21,8 @@
     <ClCompile Include="test_i_video.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test_m_argv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
