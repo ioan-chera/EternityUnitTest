@@ -1,46 +1,39 @@
 #include <vector>
 #include "gtest/gtest.h"
 #include "m_argv.h"
+#include "MyArg.h"
 
-class MArgv : public ::testing::Test
+//
+// Locally modified fixture
+//
+class MArgv : public MyArg
 {
 protected:
 	MArgv()
 	{
-		m_args.push_back("eternity.exe");
-		m_args.push_back("-iwad");
-		m_args.push_back("doom2.wad");
-		m_args.push_back("-deathmatch");
+		add("eternity.exe");
+		add("-iwad");
+		add("doom2.wad");
+		add("-deathmatch");
 
-		m_args.push_back("-play");
-		m_args.push_back("recording");
-		m_args.push_back("-playdemo");
-		m_args.push_back("recording");
+		add("-play");
+		add("recording");
+		add("-playdemo");
+		add("recording");
 
-		m_args.push_back("-warp");
-		m_args.push_back("2");
-		m_args.push_back("3");
-		m_args.push_back("-wart");
+		add("-warp");
+		add("2");
+		add("3");
+		add("-wart");
 
-		m_args.push_back("5");
-		m_args.push_back(nullptr);	// mandatory
-
-		myargv = (char**)m_args.data();	// ugly cast
-		myargc = (int)m_args.size() - 1;
+		add("5");
 	}
-	~MArgv()
-	{
-		myargc = 0;
-		myargv = nullptr;
-	}
-
-	std::vector<const char *> m_args;	// storage
 };
 
 TEST_F(MArgv, MCheckParm)
 {
 	// Environment: myargc, myargv
-	ASSERT_EQ(M_CheckParm("-episode"), 0);	// inexistent parametr
+	ASSERT_EQ(M_CheckParm("-episode"), 0);	// inexistent parameter
 	ASSERT_EQ(M_CheckParm("-IWAD"), 1);	// case insensitive
 	ASSERT_EQ(M_CheckParm("eternity.exe"), 0);	// program name should not really be used
 	ASSERT_EQ(M_CheckParm("-deathmatch"), 3);	// exact name

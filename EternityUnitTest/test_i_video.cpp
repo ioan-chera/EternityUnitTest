@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "doomdef.h"
 #include "i_video.h"
+#include "MyArg.h"
 
 TEST(IVideo, Geom)
 {
@@ -127,4 +128,35 @@ TEST(IVideo, Geom)
 	geom4.parse(strbuf);
 	snprintf(strbuf, sizeof(strbuf), "%dx%dd", MAX_SCREENWIDTH, MAX_SCREENHEIGHT);
 	ASSERT_EQ(geom4.toString(), strbuf);
+}
+
+//
+// Arg stuff
+//
+class IVideoMyArg : public MyArg
+{
+};
+
+TEST_F(IVideoMyArg, ICheckVideoCmdsOnce)
+{
+	Geom geom;	// have it defaulted
+	add("eternity");
+	add("-geom");
+	add("800x600f");
+	add("-vsync");
+	add("-hardware");
+	add("-noframe");
+	I_CheckVideoCmdsOnce(geom);
+
+	ASSERT_EQ(geom.toString(), "800x600fvhn");
+
+	// Change geom to something else
+	geom.width = 1000;
+	ASSERT_EQ(geom.toString(), "1000x600fvhn");
+
+	// Attempt the command again
+	I_CheckVideoCmdsOnce(geom);
+
+	// See that it can't change again
+	ASSERT_EQ(geom.toString(), "1000x600fvhn");
 }
