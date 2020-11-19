@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EternityUnitTest.cpp" />
+    <ClCompile Include="test_i_video.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\googletest\build\googletest\gtest.vcxproj">
