@@ -223,3 +223,20 @@ TEST(IVideo, IParseResolution)
 	ASSERT_EQ(width, MAX_SCREENWIDTH);
 	ASSERT_EQ(height, MAX_SCREENHEIGHT);
 }
+
+TEST(IVideo, IVideoShouldLetterbox)
+{
+	// Environment: i_letterbox
+	i_letterbox = 1;
+	ASSERT_FALSE(I_VideoShouldLetterbox(1600, 900));
+	ASSERT_FALSE(I_VideoShouldLetterbox(400, 300));
+	ASSERT_TRUE(I_VideoShouldLetterbox(1280, 1024));
+	ASSERT_TRUE(I_VideoShouldLetterbox(600, 500));
+
+	// Check any multiple of 5 / 4 to prevent any overflows or imprecision
+	for(int i = 1; i < MAX_SCREENWIDTH / 5; ++i)
+		ASSERT_TRUE(I_VideoShouldLetterbox(5 * i, 4 * i));
+
+	i_letterbox = 0;
+	ASSERT_FALSE(I_VideoShouldLetterbox(1280, 1024));	// must be false now
+}
