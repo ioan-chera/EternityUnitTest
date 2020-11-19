@@ -158,3 +158,68 @@ TEST_F(IVideoMyArg, ICheckVideoCmdsOnce)
 	// See that it can't change again
 	ASSERT_EQ(geom.toString(), "1000x600fvhn");
 }
+
+TEST(IVideo, IParseResolution)
+{
+	// Check that native just copies the values and that it's case insensitive.
+	int width, height;
+	I_ParseResolution("NATIVE", width, height, 500, 400);
+	ASSERT_EQ(width, 500);
+	ASSERT_EQ(height, 400);
+
+	// Check that an invalid resolution will just reset to the game resolution
+	width = height = 0;
+	I_ParseResolution("200x200", width, height, 500, 400);
+	ASSERT_EQ(width, 500);
+	ASSERT_EQ(height, 400);
+
+	// Likewise check empty string
+	width = height = 0;
+	I_ParseResolution("", width, height, 500, 400);
+	ASSERT_EQ(width, 500);
+	ASSERT_EQ(height, 400);
+
+	char strbuf[16];
+
+	// Check underflowing width
+	width = height = 0;
+	snprintf(strbuf, sizeof(strbuf), "%dx%d", Geom::minimumWidth - 1, Geom::minimumHeight);
+	I_ParseResolution(strbuf, width, height, 500, 400);
+	ASSERT_EQ(width, 500);
+	ASSERT_EQ(height, 400);
+
+	// Check underflowing height
+	width = height = 0;
+	snprintf(strbuf, sizeof(strbuf), "%dx%d", Geom::minimumWidth, Geom::minimumHeight - 1);
+	I_ParseResolution(strbuf, width, height, 500, 400);
+	ASSERT_EQ(width, 500);
+	ASSERT_EQ(height, 400);
+
+	// Check minimum size
+	width = height = 0;
+	snprintf(strbuf, sizeof(strbuf), "%dx%d", Geom::minimumWidth, Geom::minimumHeight);
+	I_ParseResolution(strbuf, width, height, 500, 400);
+	ASSERT_EQ(width, Geom::minimumWidth);
+	ASSERT_EQ(height, Geom::minimumHeight);
+
+	// Check overflowing width
+	width = height = 0;
+	snprintf(strbuf, sizeof(strbuf), "%dx%d", MAX_SCREENWIDTH + 1, MAX_SCREENHEIGHT);
+	I_ParseResolution(strbuf, width, height, 500, 400);
+	ASSERT_EQ(width, 500);
+	ASSERT_EQ(height, 400);
+
+	// Check overflowing height
+	width = height = 0;
+	snprintf(strbuf, sizeof(strbuf), "%dx%d", MAX_SCREENWIDTH, MAX_SCREENHEIGHT + 1);
+	I_ParseResolution(strbuf, width, height, 500, 400);
+	ASSERT_EQ(width, 500);
+	ASSERT_EQ(height, 400);
+
+	// Check maximum size
+	width = height = 0;
+	snprintf(strbuf, sizeof(strbuf), "%dx%d", MAX_SCREENWIDTH, MAX_SCREENHEIGHT);
+	I_ParseResolution(strbuf, width, height, 500, 400);
+	ASSERT_EQ(width, MAX_SCREENWIDTH);
+	ASSERT_EQ(height, MAX_SCREENHEIGHT);
+}
