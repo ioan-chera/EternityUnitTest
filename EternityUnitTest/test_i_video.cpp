@@ -133,9 +133,7 @@ TEST(IVideo, Geom)
 //
 // Arg stuff
 //
-class IVideoMyArg : public MyArg
-{
-};
+using IVideoMyArg = MyArg;
 
 TEST_F(IVideoMyArg, ICheckVideoCmdsOnce)
 {
