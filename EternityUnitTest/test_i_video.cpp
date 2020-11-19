@@ -32,7 +32,7 @@ TEST(IVideo, Geom)
 		"1280x1024",
 		"1440x900",
 		"1920x1080",
-		"2880x1800"
+		"2880x1800",
 	};
 	for(const char *resolution : commonResolutions)
 	{
