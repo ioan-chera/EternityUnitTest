@@ -2,3 +2,5 @@
 *.vcxproj.user
 Debug/
 Win32/DebugStaticLib/
+EternityUnitTest.xcodeproj/project.xcworkspace/xcuserdata
+EternityUnitTest.xcodeproj/xcuserdata
