@@ -133,6 +133,8 @@ TEST(ACSVMString, StringTable)
 
         // Check that the unremoved string was left alone
         ASSERT_STREQ(table[1].str, "Bolton");
+        // Add a lock for later checking
+        ++table[1].lock;
 
         // Check that it's safe to go overflow
         ASSERT_EQ(table[100], table.getNone());
@@ -154,5 +156,14 @@ TEST(ACSVMString, StringTable)
         otherStrings.insert(newTable[2].str);
         ASSERT_TRUE(otherStrings.count("Richard"));
         ASSERT_TRUE(otherStrings.count("Gibson"));
+        ASSERT_EQ(newTable[1].lock, 1);
+
+        // Test that the lock is equally checked like the ref
+        newTable.collectBegin();
+        newTable.collectEnd();
+        ASSERT_EQ(newTable.size(), 1);
+        ASSERT_STREQ(newTable[1].str, "Bolton");
+        --newTable[1].lock;
+        ASSERT_EQ(newTable[1].lock, 0);
     }
 }
