@@ -2,78 +2,70 @@
 #include "acs_intr.h"
 #include "ACSVM/Module.hpp"
 #include "ACSVM/Scope.hpp"
+#include "ACSVM/Script.hpp"
 
-#if 0
-class MockModuleName : public ACSVM::ModuleName
-{
-public:
-    MockModuleName() : ACSVM::ModuleName(nullptr, nullptr, 0)
-    {
-    }
-};
+using ACSVM::Environment;
+using ACSVM::GlobalScope;
+using ACSVM::HubScope;
+using ACSVM::MapScope;
+using ACSVM::Module;
+using ACSVM::ModuleName;
+using ACSVM::Script;
+using ACSVM::Thread;
+using ACSVM::Word;
 
-class MockModule : public ACSVM::Module
-{
-public:
-    MockModule(ACSVM::Environment *env) : ACSVM::Module(env, MockModuleName())
-    {
-        static const char *strdata = "jackson";
-        stringV.alloc(1, new ACSVM::String(ACSVM::StringData(strdata, strdata + sizeof(strdata) - 1), 0));
-
-
-    }
-};
-
-class MockEnvironment : public ACSVM::Environment
+class MockEnvironment : public Environment
 {
 protected:
-    void loadModule(ACSVM::Module *module) override
+    void loadModule(Module *module) override
     {
     }
 };
 
-class MockString : public ACSVM::String
-{
-
-};
-
-class MockMapScope : public ACSVM::MapScope
+class MockModule : public Module
 {
 public:
-    MockMapScope(ACSVM::HubScope *hub, ACSVM::Word id) : ACSVM::MapScope(hub, id)
+    MockModule(Environment *env) : Module(env, ModuleName(nullptr, nullptr, 0))
     {
-        module0 = new MockModule(hub->env);
     }
-
-};
-
-class MockThread : public ACSVM::Thread
-{
-public:
-    MockThread(const char *value) : ACSVM::Thread(nullptr)
-    {
-        mEnvironment = new MockEnvironment;
-        mGlobalScope = new ACSVM::GlobalScope(mEnvironment, 0);
-        mHubScope = new ACSVM::HubScope(mGlobalScope, 0);
-        scopeMap = new MockMapScope(mHubScope, 0);
-    }
-
-    virtual ~MockThread()
-    {
-        delete scopeMap;
-        delete mHubScope;
-        delete mGlobalScope;
-        delete mEnvironment;
-    }
-
-    MockEnvironment *mEnvironment;
-    ACSVM::GlobalScope *mGlobalScope;
-    ACSVM::HubScope *mHubScope;
 };
 
 
 TEST(ACSFunc, ACSCFChangeCeil)
 {
-    
+    // TODO: move this into a fixture
+    MockEnvironment environment;
+    Thread *thread = environment.getFreeThread();
+    GlobalScope scope(&environment, 0);
+    HubScope hubScope(&scope, 0);
+    MapScope mapScope(&hubScope, 0);
+    MockModule module(&environment);
+    Module *modulePointer = &module;
+    mapScope.addModules(&modulePointer, 1);
+    Script script(&module);
+
+    Word args[1] = {};
+    thread->start(&script, &mapScope, nullptr, args, 1);
+
+    module.stringV.alloc(1, &environment.stringTable[{"FLAT1", 5}]);
+
+    ASSERT_STREQ(thread->scopeMap->getString(0)->str, "FLAT1");
+
+    // TODO
+//    Word tag = 1;
+//    Word picnum = 0;
+//
+//    const Word functionArgs[2] = { tag, picnum };
+//
+//    bool result = ACS_CF_ChangeCeil(thread, functionArgs, 2);
+//    ASSERT_FALSE(result);
+
+    // TODO: R_CheckForFlat, P_FindSectorFromTag, P_SetSectorCeilingPic
+
+    // R_CheckForFlat TODO: R_SearchFlats, R_SearchWalls, texture_t
+    // R_SearchFlats: flattable. Set up from R_InitTextureHash.
+    // R_InitTextureHash: called from R_InitTextures
+    // So we need a way to get some placeholder flats
+    // We need wGlobalDir now
+    // Calls done to the global directory: getNamespace
 }
-#endif
