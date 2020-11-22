@@ -50,7 +50,7 @@ public:
 class MockThread : public ACSVM::Thread
 {
 public:
-    MockThread() : ACSVM::Thread(nullptr)
+    MockThread(const char *value) : ACSVM::Thread(nullptr)
     {
         mEnvironment = new MockEnvironment;
         mGlobalScope = new ACSVM::GlobalScope(mEnvironment, 0);
