@@ -13,6 +13,7 @@
 		4F8867B925697E59009E69B1 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F8867B625697E59009E69B1 /* SDL2.framework */; };
 		4F886838256A927C009E69B1 /* test_acs_func.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F886837256A927C009E69B1 /* test_acs_func.cpp */; };
 		4F88683E256AA6CE009E69B1 /* test_acsvm_vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F88683D256AA6CE009E69B1 /* test_acsvm_vector.cpp */; };
+		4F886842256AAADF009E69B1 /* test_acsvm_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F886841256AAADF009E69B1 /* test_acsvm_string.cpp */; };
 		4FC359B3256850F200736775 /* test_cam_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC359AE256850F200736775 /* test_cam_common.cpp */; };
 		4FC359B4256850F200736775 /* MyArg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC359AF256850F200736775 /* MyArg.cpp */; };
 		4FC359B5256850F200736775 /* test_d_dehtbl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC359B0256850F200736775 /* test_d_dehtbl.cpp */; };
@@ -86,6 +87,7 @@
 		4F8867FE2569814D009E69B1 /* EternityUnitTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = EternityUnitTest.entitlements; path = EternityUnitTest/EternityUnitTest.entitlements; sourceTree = "<group>"; };
 		4F886837256A927C009E69B1 /* test_acs_func.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = test_acs_func.cpp; path = EternityUnitTest/test_acs_func.cpp; sourceTree = "<group>"; };
 		4F88683D256AA6CE009E69B1 /* test_acsvm_vector.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = test_acsvm_vector.cpp; path = EternityUnitTest/test_acsvm_vector.cpp; sourceTree = "<group>"; };
+		4F886841256AAADF009E69B1 /* test_acsvm_string.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = test_acsvm_string.cpp; path = EternityUnitTest/test_acsvm_string.cpp; sourceTree = "<group>"; };
 		4FC359972568509100736775 /* EternityUnitTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = EternityUnitTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FC359AD256850F200736775 /* MyArg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyArg.h; path = EternityUnitTest/MyArg.h; sourceTree = "<group>"; };
 		4FC359AE256850F200736775 /* test_cam_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_cam_common.cpp; path = EternityUnitTest/test_cam_common.cpp; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 				4FC359B0256850F200736775 /* test_d_dehtbl.cpp */,
 				4FC359B1256850F200736775 /* test_i_video.cpp */,
 				4FC359B2256850F200736775 /* test_m_argv.cpp */,
+				4F886841256AAADF009E69B1 /* test_acsvm_string.cpp */,
 			);
 			name = EternityUnitTest;
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 				4FC359B7256850F200736775 /* test_m_argv.cpp in Sources */,
 				4FC359B3256850F200736775 /* test_cam_common.cpp in Sources */,
 				4FC359B5256850F200736775 /* test_d_dehtbl.cpp in Sources */,
+				4F886842256AAADF009E69B1 /* test_acsvm_string.cpp in Sources */,
 				4F88683E256AA6CE009E69B1 /* test_acsvm_vector.cpp in Sources */,
 				4FC359B6256850F200736775 /* test_i_video.cpp in Sources */,
 			);
