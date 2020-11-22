@@ -5,14 +5,17 @@
 #include "gtest/gtest.h"
 #include "ACSVM/String.hpp"
 
+using ACSVM::StrDup;
 using ACSVM::StrHash;
 using ACSVM::String;
 using ACSVM::StringData;
 using ACSVM::StringTable;
 using std::cout;
 using std::endl;
+using std::hash;
 using std::string;
 using std::stringstream;
+using std::unique_ptr;
 using std::unordered_set;
 
 TEST(ACSVMString, StrHash)
@@ -98,6 +101,9 @@ TEST(ACSVMString, StringTable)
         ASSERT_EQ(string3.len0, 6);
         ASSERT_STREQ(string3.str, "Design");
 
+        // Check the hash function
+        ASSERT_EQ(hash<StringData>()(string3), string3.hash);
+
         // Check that it's safe to overflow
         ASSERT_EQ(string3.get(100), 0);
 
@@ -165,5 +171,18 @@ TEST(ACSVMString, StringTable)
         ASSERT_STREQ(newTable[1].str, "Bolton");
         --newTable[1].lock;
         ASSERT_EQ(newTable[1].lock, 0);
+    }
+}
+
+TEST(ACSVMString, StrDup)
+{
+    {
+        unique_ptr<char[]> duped = StrDup("Jackson");
+        ASSERT_STREQ(duped.get(), "Jackson");
+        ASSERT_NE(duped.get(), "Jackson");  // also check that it can't be identical
+    }
+    {
+        unique_ptr<char[]> duped = StrDup("Jackson", 4);
+        ASSERT_STREQ(duped.get(), "Jack");
     }
 }
