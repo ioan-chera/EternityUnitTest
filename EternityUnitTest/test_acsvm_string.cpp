@@ -75,7 +75,7 @@ TEST(ACSVMString, StringTable)
         // Test the add-by-access
         String &string1 = table[{"Michael", 7}];
         String &string2 = table[{"Bolton", 6}];
-        String &string3 = table[{"Designer", 8}];
+        String &string3 = table[{"Designer", 6}];   // cut off
         ASSERT_EQ(table.size(), 3);
         ASSERT_EQ(table[0], string1);
         ASSERT_EQ(table[1], string2);
@@ -83,6 +83,23 @@ TEST(ACSVMString, StringTable)
         ASSERT_EQ(&table[0], &string1);
         ASSERT_EQ(&table[1], &string2);
         ASSERT_EQ(&table[2], &string3);
+
+        // Test "idx" info
+        ASSERT_EQ(string1.idx, 0);
+        ASSERT_EQ(string2.idx, 1);
+        ASSERT_EQ(string3.idx, 2);
+        // Check that "String::get" works
+        for(int i = 0; i < 6; ++i)
+            ASSERT_EQ(string3.get(i), "Designer"[i]);
+        // Check that it honours the cut-off
+        ASSERT_EQ(string3.get(6), 0);
+        ASSERT_EQ(string3.get(7), 0);
+        // NOTE: len0 will be correct, and input string truncated correctly
+        ASSERT_EQ(string3.len0, 6);
+        ASSERT_STREQ(string3.str, "Design");
+
+        // Check that it's safe to overflow
+        ASSERT_EQ(string3.get(100), 0);
 
         // Test the garbage collection
         table.collectBegin();
