@@ -15,6 +15,7 @@
 		4F88683E256AA6CE009E69B1 /* test_acsvm_vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F88683D256AA6CE009E69B1 /* test_acsvm_vector.cpp */; };
 		4F886842256AAADF009E69B1 /* test_acsvm_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F886841256AAADF009E69B1 /* test_acsvm_string.cpp */; };
 		4F886845256AC835009E69B1 /* test_acsvm_list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F886844256AC835009E69B1 /* test_acsvm_list.cpp */; };
+		4F88684B256C3CCA009E69B1 /* textures.wad in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4F886849256C3CB5009E69B1 /* textures.wad */; };
 		4FC359B3256850F200736775 /* test_cam_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC359AE256850F200736775 /* test_cam_common.cpp */; };
 		4FC359B4256850F200736775 /* MyArg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC359AF256850F200736775 /* MyArg.cpp */; };
 		4FC359B5256850F200736775 /* test_d_dehtbl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FC359B0256850F200736775 /* test_d_dehtbl.cpp */; };
@@ -70,6 +71,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		4F88684A256C3CC4009E69B1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				4F88684B256C3CCA009E69B1 /* textures.wad in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4FC359952568509100736775 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -90,6 +101,7 @@
 		4F88683D256AA6CE009E69B1 /* test_acsvm_vector.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = test_acsvm_vector.cpp; path = EternityUnitTest/test_acsvm_vector.cpp; sourceTree = "<group>"; };
 		4F886841256AAADF009E69B1 /* test_acsvm_string.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = test_acsvm_string.cpp; path = EternityUnitTest/test_acsvm_string.cpp; sourceTree = "<group>"; };
 		4F886844256AC835009E69B1 /* test_acsvm_list.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = test_acsvm_list.cpp; path = EternityUnitTest/test_acsvm_list.cpp; sourceTree = "<group>"; };
+		4F886849256C3CB5009E69B1 /* textures.wad */ = {isa = PBXFileReference; lastKnownFileType = file; name = textures.wad; path = EternityUnitTest/wads/textures.wad; sourceTree = "<group>"; };
 		4FC359972568509100736775 /* EternityUnitTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = EternityUnitTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FC359AD256850F200736775 /* MyArg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MyArg.h; path = EternityUnitTest/MyArg.h; sourceTree = "<group>"; };
 		4FC359AE256850F200736775 /* test_cam_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test_cam_common.cpp; path = EternityUnitTest/test_cam_common.cpp; sourceTree = "<group>"; };
@@ -118,6 +130,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4F886848256C3CA5009E69B1 /* wads */ = {
+			isa = PBXGroup;
+			children = (
+				4F886849256C3CB5009E69B1 /* textures.wad */,
+			);
+			name = wads;
+			sourceTree = "<group>";
+		};
 		4FC3598E2568509100736775 = {
 			isa = PBXGroup;
 			children = (
@@ -140,6 +160,7 @@
 		4FC359AC256850E400736775 /* EternityUnitTest */ = {
 			isa = PBXGroup;
 			children = (
+				4F886848256C3CA5009E69B1 /* wads */,
 				4F8867FE2569814D009E69B1 /* EternityUnitTest.entitlements */,
 				4FC359AF256850F200736775 /* MyArg.cpp */,
 				4FC359AD256850F200736775 /* MyArg.h */,
@@ -195,6 +216,7 @@
 				4FC359932568509100736775 /* Sources */,
 				4FC359942568509100736775 /* Frameworks */,
 				4FC359952568509100736775 /* CopyFiles */,
+				4F88684A256C3CC4009E69B1 /* CopyFiles */,
 			);
 			buildRules = (
 			);
