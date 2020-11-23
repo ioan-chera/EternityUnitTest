@@ -1,5 +1,9 @@
 #include "gtest/gtest.h"
 #include "acs_intr.h"
+#include "d_files.h"
+#include "d_gi.h"
+#include "r_data.h"
+#include "w_wad.h"
 #include "ACSVM/Module.hpp"
 #include "ACSVM/Scope.hpp"
 #include "ACSVM/Script.hpp"
@@ -13,6 +17,8 @@ using ACSVM::ModuleName;
 using ACSVM::Script;
 using ACSVM::Thread;
 using ACSVM::Word;
+
+void R_InitTextures();
 
 class MockEnvironment : public Environment
 {
@@ -50,6 +56,13 @@ TEST(ACSFunc, ACSCFChangeCeil)
     module.stringV.alloc(1, &environment.stringTable[{"FLAT1", 5}]);
 
     ASSERT_STREQ(thread->scopeMap->getString(0)->str, "FLAT1");
+
+    D_SetGameModeInfo(retail, doom);
+    D_AddFile("textures.wad", lumpinfo_t::ns_global, nullptr, 0, DAF_NONE);
+    wGlobalDir.initMultipleFiles(wadfiles);
+    R_InitTextures();
+
+    ASSERT_NE(R_CheckForFlat("FLAT"), -1);
 
     // TODO
 //    Word tag = 1;
