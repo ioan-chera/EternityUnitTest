@@ -33,6 +33,18 @@
     <ClCompile Include="test_d_dehtbl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="test_acs_func.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_acsvm_list.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_acsvm_string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="test_acsvm_vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyArg.h">

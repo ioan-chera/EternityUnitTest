@@ -160,6 +160,10 @@
   <ItemGroup>
     <ClCompile Include="EternityUnitTest.cpp" />
     <ClCompile Include="MyArg.cpp" />
+    <ClCompile Include="test_acsvm_list.cpp" />
+    <ClCompile Include="test_acsvm_string.cpp" />
+    <ClCompile Include="test_acsvm_vector.cpp" />
+    <ClCompile Include="test_acs_func.cpp" />
     <ClCompile Include="test_cam_common.cpp" />
     <ClCompile Include="test_d_dehtbl.cpp" />
     <ClCompile Include="test_i_video.cpp" />
