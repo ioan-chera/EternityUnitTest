@@ -2,7 +2,9 @@
 #include "acs_intr.h"
 #include "d_files.h"
 #include "d_gi.h"
+#include "p_spec.h"
 #include "r_data.h"
+#include "r_state.h"
 #include "w_wad.h"
 #include "ACSVM/Module.hpp"
 #include "ACSVM/Scope.hpp"
@@ -15,8 +17,10 @@ using ACSVM::MapScope;
 using ACSVM::Module;
 using ACSVM::ModuleName;
 using ACSVM::Script;
+using ACSVM::StringData;
 using ACSVM::Thread;
 using ACSVM::Word;
+using std::vector;
 
 void R_InitTextures();
 
@@ -36,49 +40,125 @@ public:
     }
 };
 
-
-TEST(ACSFunc, ACSCFChangeCeil)
+class ACSFuncThreadFixture : public ::testing::Test
 {
-    // TODO: move this into a fixture
-    MockEnvironment environment;
-    Thread *thread = environment.getFreeThread();
-    GlobalScope scope(&environment, 0);
-    HubScope hubScope(&scope, 0);
-    MapScope mapScope(&hubScope, 0);
-    MockModule module(&environment);
-    Module *modulePointer = &module;
-    mapScope.addModules(&modulePointer, 1);
-    Script script(&module);
+protected:
+    ACSFuncThreadFixture() :
+        mThread(mEnvironment.getFreeThread()),
+        mGlobalScope(&mEnvironment, 0),
+        mHubScope(&mGlobalScope, 0),
+        mMapScope(&mHubScope, 0),
+        mModule(&mEnvironment),
+        mModulePointer(&mModule),
+        mScript(&mModule)
+    {
+        mMapScope.addModules(&mModulePointer, 1);
+        Word args[1] = {};
+        mThread->start(&mScript, &mMapScope, nullptr, args, 1);
+    }
 
-    Word args[1] = {};
-    thread->start(&script, &mapScope, nullptr, args, 1);
+    void addString(const char *string)
+    {
+        StringData data(string, strlen(string));
+        size_t size = mModule.scriptV.size();
+        mModule.stringV.realloc(size + 1, &mEnvironment.stringTable[data]);
+        ASSERT_STREQ(mThread->scopeMap->getString(static_cast<Word>(size))->str, string);
+    }
 
-    module.stringV.alloc(1, &environment.stringTable[{"FLAT1", 5}]);
+    MockEnvironment mEnvironment;
+    Thread *mThread;
+    GlobalScope mGlobalScope;
+    HubScope mHubScope;
+    MapScope mMapScope;
+    MockModule mModule;
+    Module *mModulePointer;
+    Script mScript;
+};
 
-    ASSERT_STREQ(thread->scopeMap->getString(0)->str, "FLAT1");
-
+static void addTextureWad()
+{
     D_SetGameModeInfo(retail, doom);
     D_AddFile("textures.wad", lumpinfo_t::ns_global, nullptr, 0, DAF_NONE);
     wGlobalDir.initMultipleFiles(wadfiles);
     R_InitTextures();
+}
 
-    ASSERT_NE(R_CheckForFlat("FLAT"), -1);
+static sector_t makeEmptySector()
+{
+    sector_t sector = {};
+    sector.firsttag = sector.nexttag = -1;
+    return sector;
+}
 
-    // TODO
-//    Word tag = 1;
-//    Word picnum = 0;
-//
-//    const Word functionArgs[2] = { tag, picnum };
-//
-//    bool result = ACS_CF_ChangeCeil(thread, functionArgs, 2);
-//    ASSERT_FALSE(result);
+static void tagSector(vector<sector_t> &sectors, int index, int tag)
+{
+    int size = static_cast<int>(sectors.size());
+    int hash = tag % size;
+    if(sectors[hash].firsttag == -1)
+    {
+        sectors[hash].firsttag = index;
+        sectors[index].tag = tag;
+    }
+    else
+    {
+        bool found = false;
+        int *lastNext = nullptr;
+        for(int current = sectors[hash].firsttag; current != -1; current = sectors[current].nexttag)
+        {
+            lastNext = &sectors[current].nexttag;
+            if(current == index)
+            {
+                sectors[current].tag = tag;
+                found = true;
+                break;
+            }
+        }
+        if(!found)
+        {
+            *lastNext = index;
+            sectors[index].tag = tag;
+        }
+    }
+}
 
-    // TODO: R_CheckForFlat, P_FindSectorFromTag, P_SetSectorCeilingPic
+TEST_F(ACSFuncThreadFixture, ACSCFChangeCeil)
+{
+    addString("FLAT");
+    addString("F_SKY1");
+    addString("NOFLAT");
 
-    // R_CheckForFlat TODO: R_SearchFlats, R_SearchWalls, texture_t
-    // R_SearchFlats: flattable. Set up from R_InitTextureHash.
-    // R_InitTextureHash: called from R_InitTextures
-    // So we need a way to get some placeholder flats
-    // We need wGlobalDir now
-    // Calls done to the global directory: getNamespace
+    addTextureWad();
+
+    int flatIndex = R_CheckForFlat("FLAT");
+    ASSERT_NE(flatIndex, -1);
+    ASSERT_EQ(R_CheckForFlat("NOFLAT"), -1);
+
+    vector<sector_t> sectors = { makeEmptySector(), makeEmptySector(), makeEmptySector() };
+    ::sectors = sectors.data();
+    ::numsectors = static_cast<int>(sectors.size());
+    for(sector_t &sector: sectors)
+    {
+        tagSector(sectors, <#int index#>, <#int tag#>)
+    }
+    tagSector(sectors, 1, 1);
+    tagSector(sectors, 2, 2);
+
+    ASSERT_EQ(P_FindSectorFromTag(1, -1), 1);
+    ASSERT_EQ(P_FindSectorFromTag(0, -1), 0);
+    ASSERT_EQ(P_FindSectorFromTag(2, -1), 2);
+
+    Word functionArgs[2] = { 1, 0 };
+
+    ASSERT_NE(sectors[1].srf.ceiling.pic, flatIndex);
+    bool result = ACS_CF_ChangeCeil(mThread, functionArgs, 2);
+    ASSERT_FALSE(result);
+    ASSERT_EQ(sectors[1].srf.ceiling.pic, flatIndex);
+
+    functionArgs[0] = 2;
+    functionArgs[1] = 1;
+
+    int pic = sectors[2].srf.ceiling.pic;
+    result = ACS_CF_ChangeCeil(mThread, functionArgs, 2);
+    ASSERT_FALSE(result);
+    ASSERT_EQ(sectors[2].srf.ceiling.pic, pic);
 }
