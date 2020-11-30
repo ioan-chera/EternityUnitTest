@@ -60,7 +60,7 @@ protected:
     void addString(const char *string)
     {
         StringData data(string, strlen(string));
-        size_t size = mModule.scriptV.size();
+        size_t size = mModule.stringV.size();
         mModule.stringV.realloc(size + 1, &mEnvironment.stringTable[data]);
         ASSERT_STREQ(mThread->scopeMap->getString(static_cast<Word>(size))->str, string);
     }
@@ -136,10 +136,7 @@ TEST_F(ACSFuncThreadFixture, ACSCFChangeCeil)
     vector<sector_t> sectors = { makeEmptySector(), makeEmptySector(), makeEmptySector() };
     ::sectors = sectors.data();
     ::numsectors = static_cast<int>(sectors.size());
-    for(sector_t &sector: sectors)
-    {
-        tagSector(sectors, <#int index#>, <#int tag#>)
-    }
+    tagSector(sectors, 0, 0);
     tagSector(sectors, 1, 1);
     tagSector(sectors, 2, 2);
 
@@ -147,16 +144,18 @@ TEST_F(ACSFuncThreadFixture, ACSCFChangeCeil)
     ASSERT_EQ(P_FindSectorFromTag(0, -1), 0);
     ASSERT_EQ(P_FindSectorFromTag(2, -1), 2);
 
-    Word functionArgs[2] = { 1, 0 };
+    Word functionArgs[2] = { 1, 0 };    // FLAT (have it)
 
+    // Expect setting known flat results in success
     ASSERT_NE(sectors[1].srf.ceiling.pic, flatIndex);
     bool result = ACS_CF_ChangeCeil(mThread, functionArgs, 2);
     ASSERT_FALSE(result);
     ASSERT_EQ(sectors[1].srf.ceiling.pic, flatIndex);
 
     functionArgs[0] = 2;
-    functionArgs[1] = 1;
+    functionArgs[1] = 2;    // NOFLAT (don't have it)
 
+    // Expect that it won't change if flat is absent
     int pic = sectors[2].srf.ceiling.pic;
     result = ACS_CF_ChangeCeil(mThread, functionArgs, 2);
     ASSERT_FALSE(result);
