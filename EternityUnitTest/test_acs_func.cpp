@@ -121,7 +121,7 @@ static void tagSector(vector<sector_t> &sectors, int index, int tag)
     }
 }
 
-TEST_F(ACSFuncThreadFixture, ACSCFChangeCeil)
+TEST_F(ACSFuncThreadFixture, ACSCFChangeCeilAndFloor)
 {
     addString("FLAT");
     addString("F_SKY1");
@@ -152,6 +152,12 @@ TEST_F(ACSFuncThreadFixture, ACSCFChangeCeil)
     ASSERT_FALSE(result);
     ASSERT_EQ(sectors[1].srf.ceiling.pic, flatIndex);
 
+    // Same for floor
+    ASSERT_NE(sectors[1].srf.floor.pic, flatIndex);
+    result = ACS_CF_ChangeFloor(mThread, functionArgs, 2);
+    ASSERT_FALSE(result);
+    ASSERT_EQ(sectors[1].srf.floor.pic, flatIndex);
+
     functionArgs[0] = 2;
     functionArgs[1] = 2;    // NOFLAT (don't have it)
 
@@ -160,4 +166,9 @@ TEST_F(ACSFuncThreadFixture, ACSCFChangeCeil)
     result = ACS_CF_ChangeCeil(mThread, functionArgs, 2);
     ASSERT_FALSE(result);
     ASSERT_EQ(sectors[2].srf.ceiling.pic, pic);
+
+    // But floor WILL work, falling back to the invalid texture
+    result = ACS_CF_ChangeFloor(mThread, functionArgs, 2);
+    ASSERT_FALSE(result);
+    ASSERT_EQ(sectors[2].srf.floor.pic, texturecount - 1);
 }
